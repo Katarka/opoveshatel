@@ -2,7 +2,7 @@ const { Telegraf, Markup} = require('telegraf');
 require('dotenv').config()
 const {textError, textApply} = require('./const')
 
-const bot = new Telegraf(process.env.BOT_TOKEN);
+const bot = new Telegraf(process.env.BOT_TOKEN); 
 bot.start((ctx) => ctx.reply(`Привет, ${ctx.message.from.first_name ? ctx.message.from.first_name : 'бродяга'}!`));
 bot.help((ctx) => ctx.reply('Send me a sticker'));
 
@@ -10,8 +10,9 @@ bot.command('bot', async (ctx)=>{
     try {
         await ctx.replyWithHTML('Оповещение', Markup.inlineKeyboard(
             [
-                [Markup.button.callback('Подтвердить', 'btn1')],
-                [Markup.button.callback('Отказаться', 'btn2')]
+                [Markup.button.callback(`Подтвердить`, 'btn1')],
+                [Markup.button.callback('Отказаться', 'btn2')],
+                [Markup.button.callback('Дата', 'btn3')]
             ]
         ))
     } catch (e) {
@@ -19,19 +20,25 @@ bot.command('bot', async (ctx)=>{
     }
 })
 
+let date = new Date()
+bot.action('btn3', async (ctx) => {
+    await ctx.reply(`${date.getDate()}/${date.getMonth() + 1}/${date.getUTCFullYear()}`)
+}) 
+
+
+// bot.on('message', function (ctx, next) {
+//     ctx.telegram.sendMessage(ctx.message.chat.id,
+//       "File content at: " + new Date() + " is: \n"
+//     )
+// });
+
+// (`${date.getDate()}/${date.getMonth() + 1}/${date.getUTCFullYear()}`)
+
 function addActionButton(name, text) {
-    bot.action(name, async (ctx)=>{
+    bot.action(name, async (ctx) => {
         try {
             await ctx.answerCbQuery()
-            await ctx.replyWithHTML(text)
-        } catch (e) {
-            console.error(e)
-        }
-    })
-    bot.action('btn2', async (ctx)=>{
-        try {
-            await ctx.answerCbQuery()
-            await ctx.replyWithHTML('Отказ!')
+            await ctx.reply(text)
         } catch (e) {
             console.error(e)
         }
