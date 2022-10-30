@@ -1,5 +1,4 @@
 const { Telegraf, Markup} = require('telegraf');
-const { keyboard } = require('telegraf/typings/markup');
 require('dotenv').config()
 const {textError, textApply} = require('./const')
 const whoiam = require('./keyboard')
@@ -17,7 +16,7 @@ let replyText = {
 }
 
 let isAdmin = (userId) => {
-    return userId == config.admin;
+    return userId === config.admin;
 };
 
 let forwardToAdmin = (ctx) => {
@@ -34,15 +33,16 @@ bot.start(async (ctx) => {
         : replyText.helloUser);
     return await ctx.reply('Custom buttons keyboard', Markup
         .keyboard([
-            ['whoiam', '😎 Popular'], // Row1 with 2 buttons
+            ['1', '😎 Popular'], // Row1 with 2 buttons
             ['☸ Setting', '📞 Feedback'], // Row2 with 2 buttons
             ['📢 Ads', '⭐️ Rate us', 'whoim'] // Row3 with 3 buttons
         ])
         .oneTime()
         .resize()
     )
-    await ctx.reply(keyboard())
 });
+
+
 
 bot.command('whoim', (ctx) => {
     const { id, username, first_name, last_name } = ctx.from;
@@ -54,9 +54,14 @@ bot.command('whoim', (ctx) => {
   *chatId* : ${ctx.chat.id}`);
   });
 
-  bot.command('time', ctx => {     
+bot.command('time', ctx => {
 	ctx.reply(String(new Date()))})
 
+bot.on('message', (ctx)=> {
+    bot.telegram.sendMessage(ctx.message.chat.id,
+        `Hello, ${ctx.message.from.first_name}\n` +
+        `You id: ${ctx.message.from.id}`)
+})
 // bot.command('custom', async (ctx) => {
 //     return await ctx.reply('Custom buttons keyboard', Markup
 //         .keyboard([
