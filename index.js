@@ -2,6 +2,7 @@ const { Telegraf, Markup} = require('telegraf');
 require('dotenv').config()
 const {textError, textApply} = require('./const')
 const whoiam = require('./keyboard')
+const { CronJob } = require('cron');
 
 let config = {
     "admin": 477534252
@@ -31,17 +32,49 @@ bot.start(async (ctx) => {
     await ctx.reply(isAdmin(ctx.message.from.id)
         ? replyText.helloAdmin
         : replyText.helloUser);
-    return await ctx.reply('Custom buttons keyboard', Markup
-        .keyboard([
-            ['1', '😎 Popular'], // Row1 with 2 buttons
+    await ctx.reply('Custom buttons keyboard', Markup.keyboard([
+            ['Subscribe', 'sub'], // Row1 with 2 buttons
             ['☸ Setting', '📞 Feedback'], // Row2 with 2 buttons
             ['📢 Ads', '⭐️ Rate us', 'whoim'] // Row3 with 3 buttons
-        ])
-        .oneTime()
-        .resize()
+        ]).oneTime().resize()
     )
 });
 
+// let triggerMsg = cron.schedule('10 1 * * * *', (bot) => {
+//     bot.telegram.sendMessage('Hey/')
+//     console.log('1 minute update')
+// })
+
+bot.command('sub', async (ctx) => {
+    // const chatId = ctx.update.callback_query.message.chat.id;
+    // await ctx.answerCbQuery();
+    await ctx.reply('ЛОВУШКА ДЖОКЕРА АКТИВЕЙТЕД')
+
+    let everyDay = new CronJob('* * * * *', () => {
+        console.log('You will see this message every second');
+        ctx.reply('Test')
+    //   const now = moment().tz('Europe/Moscow').format();
+    //   let year = now.slice(0, 4),
+    //     month = now.slice(5, 7),
+    //     day = now.slice(8, 10),
+    //     nowDay = `${day}.${month}.${year}`;
+    //   msg.telegram.sendMessage(chatId, `Оповешение, ${nowDay}`);
+        },
+        null,
+        true,
+        'Europe/Moscow',
+    );
+    everyDay.start();
+});
+
+bot.command('unsub', async (ctx) => {
+    await ctx.reply('Stop, PLS STOP')
+    let everyDay = new CronJob('* * * * *', () =>{
+        console.log('Stop')
+        ctx.reply('Stop')
+    })
+    everyDay.stop()
+})
 
 
 bot.command('whoim', (ctx) => {
