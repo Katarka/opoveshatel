@@ -1,18 +1,18 @@
-const { Telegraf, Markup} = require('telegraf');
+const {Telegraf, Markup} = require('telegraf');
 require('dotenv').config()
 const {textError, textApply} = require('./const')
 const whoiam = require('./keyboard')
-const { CronJob } = require('cron');
+const {CronJob} = require('cron');
 
 let config = {
     "admin": 477534252
 }
 
-const bot = new Telegraf(process.env.BOT_TOKEN); 
+const bot = new Telegraf(process.env.BOT_TOKEN);
 
 let replyText = {
     "helloAdmin": "Привет админ, ждем сообщения от пользователей",
-    "helloUser":  "Приветствую, отправьте мне сообщение. Постараюсь ответить в ближайшее время.",
+    "helloUser": "Приветствую, отправьте мне сообщение. Постараюсь ответить в ближайшее время.",
     "replyWrong": "Для ответа пользователю используйте функцию Ответить/Reply."
 }
 
@@ -32,12 +32,12 @@ bot.start(async (ctx) => {
     await ctx.reply(isAdmin(ctx.message.from.id)
         ? replyText.helloAdmin
         : replyText.helloUser);
-    await ctx.reply('Custom buttons keyboard', Markup.keyboard([
-            ['Subscribe', 'sub'], // Row1 with 2 buttons
-            ['☸ Setting', '📞 Feedback'], // Row2 with 2 buttons
-            ['📢 Ads', '⭐️ Rate us', 'whoim'] // Row3 with 3 buttons
-        ]).oneTime().resize()
-    )
+    // await ctx.reply('Custom buttons keyboard', Markup.keyboard([
+    //         ['Subscribe', 'sub'], // Row1 with 2 buttons
+    //         ['☸ Setting', '📞 Feedback'], // Row2 with 2 buttons
+    //         ['📢 Ads', '⭐️ Rate us', 'whoim'] // Row3 with 3 buttons
+    //     ]).oneTime().resize()
+    // )
 });
 
 // let triggerMsg = cron.schedule('10 1 * * * *', (bot) => {
@@ -48,17 +48,21 @@ bot.start(async (ctx) => {
 bot.command('sub', async (ctx) => {
     // const chatId = ctx.update.callback_query.message.chat.id;
     // await ctx.answerCbQuery();
-    await ctx.reply('ЛОВУШКА ДЖОКЕРА АКТИВЕЙТЕД')
+    await ctx.reply('Вы подписались на уведомления от телеграмм бота, спасибо!')
 
-    let everyDay = new CronJob('* * * * *', () => {
-        console.log('You will see this message every second');
-        ctx.reply('Test')
-    //   const now = moment().tz('Europe/Moscow').format();
-    //   let year = now.slice(0, 4),
-    //     month = now.slice(5, 7),
-    //     day = now.slice(8, 10),
-    //     nowDay = `${day}.${month}.${year}`;
-    //   msg.telegram.sendMessage(chatId, `Оповешение, ${nowDay}`);
+    let everyDay = new CronJob('* * * * *', async () => {
+            console.log('Уведомление отправлено');
+            await ctx.reply('Тестовое уведомление.\n' +
+                'Подтвердите, что увидели его.', Markup.inlineKeyboard(
+                [
+                    [Markup.button.callback(`Подтвердить`, 'btn3')]
+                ]))
+            //   const now = moment().tz('Europe/Moscow').format();
+            //   let year = now.slice(0, 4),
+            //     month = now.slice(5, 7),
+            //     day = now.slice(8, 10),
+            //     nowDay = `${day}.${month}.${year}`;
+            //   msg.telegram.sendMessage(chatId, `Оповешение, ${nowDay}`);
         },
         null,
         true,
@@ -67,34 +71,35 @@ bot.command('sub', async (ctx) => {
     everyDay.start();
 });
 
-bot.command('unsub', async (ctx) => {
-    await ctx.reply('Stop, PLS STOP')
-    let everyDay = new CronJob('* * * * *', () =>{
-        console.log('Stop')
-        ctx.reply('Stop')
-    })
-    everyDay.stop()
-})
+// bot.command('unsub', async (ctx) => {
+//     await ctx.reply('Stop, PLS STOP')
+//     let everyDay = new CronJob('* * * * *', () =>{
+//         console.log('Stop')
+//         ctx.reply('Stop')
+//     })
+//     everyDay.stop()
+// })
 
 
 bot.command('whoim', (ctx) => {
-    const { id, username, first_name, last_name } = ctx.from;
+    const {id, username, first_name, last_name} = ctx.from;
     return ctx.replyWithMarkdownV2(`Кто ты в телеграмме:
   *id* : ${id}
   *username* : ${username}
   *Имя* : ${first_name}
   *Фамилия* : ${last_name}
   *chatId* : ${ctx.chat.id}`);
-  });
+});
 
 bot.command('time', ctx => {
-	ctx.reply(String(new Date()))})
-
-bot.on('message', (ctx)=> {
-    bot.telegram.sendMessage(ctx.message.chat.id,
-        `Hello, ${ctx.message.from.first_name}\n` +
-        `You id: ${ctx.message.from.id}`)
+    ctx.reply(String(new Date()))
 })
+
+// bot.on('message', (ctx) => {
+//     bot.telegram.sendMessage(ctx.message.chat.id,
+//         `Hello, ${ctx.message.from.first_name}\n` +
+//         `You id: ${ctx.message.from.id}`)
+// })
 // bot.command('custom', async (ctx) => {
 //     return await ctx.reply('Custom buttons keyboard', Markup
 //         .keyboard([
@@ -124,19 +129,24 @@ bot.on('message', (ctx)=> {
 //     }
 // })
 
-// let date = new Date()
-// bot.action('btn3', async (ctx) => {
-//     await ctx.reply(`${date.getDate()}/${date.getMonth() + 1}/${date.getUTCFullYear()}`)
-// }) 
+bot.action('btn3', async (ctx) => {
+    try {
+        await ctx.answerCbQuery()
+        await ctx.forwardMessage(ctx.chat_id)
+    }
+    catch (e) {
+    console.log(e)
+    }
+})
 
 
-// // bot.on('message', function (ctx, next) {
-// //     ctx.telegram.sendMessage(ctx.message.chat.id,
-// //       "File content at: " + new Date() + " is: \n"
-// //     )
-// // });
+// bot.on('message', function (ctx, next) {
+//     ctx.telegram.sendMessage(ctx.message.chat.id,
+//       "File content at: " + new Date() + " is: \n"
+//     )
+// });
 
-// // (`${date.getDate()}/${date.getMonth() + 1}/${date.getUTCFullYear()}`)
+// (`${date.getDate()}/${date.getMonth() + 1}/${date.getUTCFullYear()}`)
 
 // function addActionButton(name, text) {
 //     bot.action(name, async (ctx) => {
@@ -150,9 +160,6 @@ bot.on('message', (ctx)=> {
 // }
 // addActionButton('btn1', textApply)
 // addActionButton('btn2', textError)
-
-
-
 
 
 bot.launch()
