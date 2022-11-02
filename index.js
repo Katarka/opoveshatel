@@ -132,7 +132,7 @@ bot.command('time', ctx => {
 bot.action('btn3', async (ctx) => {
     try {
         await ctx.answerCbQuery()
-        await ctx.forwardMessage(ctx.chat_id)
+        await ctx.reply(textApply)
     }
     catch (e) {
     console.log(e)
