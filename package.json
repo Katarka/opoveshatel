@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "api-telegram-bot": "^6.0.5",
     "cron": "^2.1.0",
     "dotenv": "^16.0.3",
     "node-cron": "^3.0.2",
